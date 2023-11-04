@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
@@ -13,12 +14,12 @@ import java.time.Duration;
 import java.util.Set;
 
 import io.qameta.allure.Step;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.vinio.Pages.*;
 
 
 public class WebTest {
-    /**
-     * начальные настройки теста
-     */
     public static WebDriver driver;
     private static String originalWindowHandle;
     public static MainPage mainPage;
@@ -61,6 +62,8 @@ public class WebTest {
 
     @Test
     public void MainTest() throws InterruptedException {
+        Duration durationTime = Duration.ofSeconds(5);
+        driver.manage().timeouts().implicitlyWait(durationTime);
         clickOnElements();
         clickOnTextBox();
         fullFields();
@@ -81,6 +84,18 @@ public class WebTest {
         closeOpeningWindow();
         clickOnAlerts();
         clickOnAlerts();
+        clickOnSimpleAlert();
+        okAlert();
+        clickOnFiveSecondAlert();
+        okAlert();
+        clickOnConfirmAlertButton();
+        okAlert();
+        clickOnConfirmAlertButton();
+        okAlert();
+        checkConfirmResult();
+        clickOnPromAlertButton();
+        inputProm();
+        checkPromptResult();
     }
     @Step
     private void clickOnElements(){mainPage.clickElements();}
@@ -136,13 +151,22 @@ public class WebTest {
     private void clickOnAlerts(){menuPage.clickAlertsButton();}
     @Step
     private void clickOnSimpleAlert(){alertPage.clickSimpleAlertButton();}
-
-    @AfterAll
-    public static void tearDown() throws InterruptedException {
-        Thread.sleep(2000);
-        driver.quit();
+    @Step
+    private void okAlert(){
+        Duration durationTime = Duration.ofSeconds(5);
+        // Ожидание появления всплывающего окна в течение 5 секунд
+        WebDriverWait wait = new WebDriverWait(driver, durationTime);
+        wait.until(ExpectedConditions.alertIsPresent());
+        // Получение объекта Alert
+        Alert alert = driver.switchTo().alert();
+        // Нажатие на кнопку "OK"
+        alert.accept();
+        // Возврат к основному контексту
+        driver.switchTo().defaultContent();
     }
-
+    @Step
+    private void clickOnFiveSecondAlert(){alertPage.clickFiveSecondAlertButton();}
+    @Step
     public void closeCurrentPage() {
         Set<String> windowHandles = driver.getWindowHandles();
         windowHandles.remove(originalWindowHandle);
@@ -152,4 +176,30 @@ public class WebTest {
         }
         driver.switchTo().window(originalWindowHandle);
     }
+    @Step
+    public void clickOnConfirmAlertButton(){alertPage.clickConfirmAlertButton();}
+    @Step
+    public void checkConfirmResult(){
+        Assertions.assertEquals("You selected Ok", alertPage.getConfirmResult());}
+    @Step
+    public void clickOnPromAlertButton(){alertPage.clickPromAlertButton();}
+    @Step
+    public void inputProm(){
+        // Переключение на всплывающее окно
+        Alert alert = driver.switchTo().alert();
+        // Ввод данных в поле
+        alert.sendKeys("Test name");
+        // Нажатие на кнопку "Ok" или другую нужную кнопку
+        alert.accept();
+    }
+    @Step
+    public void checkPromptResult(){
+        Assertions.assertEquals("You entered Test name", alertPage.getPromptResult());}
+    @AfterAll
+    public static void tearDown() throws InterruptedException {
+        Thread.sleep(2000);
+        driver.quit();
+    }
+
+
 }

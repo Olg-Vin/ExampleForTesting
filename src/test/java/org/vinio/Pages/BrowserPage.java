@@ -1,4 +1,4 @@
-package org.vinio;
+package org.vinio.Pages;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
