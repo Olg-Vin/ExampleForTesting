@@ -1,69 +1,30 @@
 package org.vinio;
 
-import org.junit.jupiter.api.AfterAll;
+import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.firefox.FirefoxOptions;
-
-import java.time.Duration;
-import java.util.Set;
-
-import io.qameta.allure.Step;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.vinio.Pages.*;
 
+import java.time.Duration;
+import java.util.Set;
 
-public class WebTest {
-    public static WebDriver driver;
-    private static String originalWindowHandle;
-    public static MainPage mainPage;
-    public static MenuPage menuPage;
-    public static ElementsPage elementsPage;
-    public static ButtonsPage buttonsPage;
-    public static BrowserPage browserPage;
-    public static AlertPage alertPage;
-
-    @BeforeAll
-    public static void setup() {
-        System.setProperty("webdriver.firefox.driver",
-                "C:/Users/Vinio/web_driver/geckodriver/geckodriver.exe");
-        String firefoxPath = "C:\\Program Files\\Firefox Developer Edition\\firefox.exe";
-        FirefoxOptions options = new FirefoxOptions();
-        options.setBinary(firefoxPath);
-
-        driver = new FirefoxDriver(options);
+@ExtendWith(TestListener.class)
+public class WebTest extends StartTestClass {
+    @Test
+    public void MainTest() {
         mainPage = new MainPage(driver);
         menuPage = new MenuPage(driver);
         elementsPage = new ElementsPage(driver);
         buttonsPage = new ButtonsPage(driver);
         browserPage = new BrowserPage(driver);
         alertPage = new AlertPage(driver);
+        openWebSite(url);
 
-        Duration durationTime = Duration.ofSeconds(5);
-        driver.manage().timeouts().pageLoadTimeout(durationTime);
-        try {
-            // Переход на веб-сайт
-            driver.get("https://demoqa.com");
-
-        }catch (TimeoutException e) {
-//            TODO В случае возникновения ошибки (например, превышение времени ожидания), прервать загрузку
-            System.out.println("ERROR");
-            System.out.println(e.getMessage());
-
-        }
-        originalWindowHandle = driver.getWindowHandle();
-    }
-
-    @Test
-    public void MainTest() throws InterruptedException {
-        Duration durationTime = Duration.ofSeconds(5);
-        driver.manage().timeouts().implicitlyWait(durationTime);
         clickOnElements();
         clickOnTextBox();
         fullFields();
@@ -90,67 +51,109 @@ public class WebTest {
         okAlert();
         clickOnConfirmAlertButton();
         okAlert();
-        clickOnConfirmAlertButton();
-        okAlert();
         checkConfirmResult();
         clickOnPromAlertButton();
         inputProm();
         checkPromptResult();
     }
     @Step
-    private void clickOnElements(){mainPage.clickElements();}
-    @Step
-    private void clickOnTextBox(){menuPage.clickTextBox();}
-    @Step
-    private void fullFields(){
-        elementsPage.inputFullName("Test Name");
-        elementsPage.inputEmail("TestEmail@gmail.com");
-        elementsPage.inputCurrentAddress("Moscow, Savyolovskiy");
-        elementsPage.inputPermanentAddress("Moscow, Savyolovskiy");
+    public void openWebSite(String url){
+        Duration durationTime = Duration.ofSeconds(5);
+        driver.manage().timeouts().pageLoadTimeout(durationTime);
+        try {
+            driver.get(url);
+        }catch (TimeoutException e) {
+//            TODO В случае возникновения ошибки (например, превышение времени ожидания), прервать загрузку
+            System.out.println("ERROR");
+            System.out.println(e.getMessage());
+        }
+        setOriginalWindowHandle();
     }
     @Step
-    private void clickOnSubmit(){elementsPage.clickSubmit();}
+    private void clickOnElements(){
+        clickElement(mainPage.getElements());
+    }
+    @Step
+    private void clickOnTextBox(){
+        clickElement(menuPage.getTextBox());
+    }
+    @Step
+    private void fullFields(){
+        inputText(elementsPage.getFullName(), "Test Name");
+        inputText(elementsPage.getEmail(), "TestEmail@gmail.com");
+        inputText(elementsPage.getCurrentAddress(), "Moscow, Savyolovskiy");
+        inputText(elementsPage.getPermanentAddress(), "Moscow, Savyolovskiy");
+    }
+    @Step
+    private void clickOnSubmit(){
+        clickElement(elementsPage.getSubmitButton());
+    }
     @Step
     private void checkData(){
-        Assertions.assertEquals("Name:Test Name", elementsPage.getNameField());
-        Assertions.assertEquals("Email:TestEmail@gmail.com", elementsPage.getEmailField());
-        Assertions.assertEquals("Current Address :Moscow, Savyolovskiy", elementsPage.getCurrentAddressField());
-        Assertions.assertEquals("Permananet Address :Moscow, Savyolovskiy", elementsPage.getPermanentAddressField());
+        Assertions.assertEquals("Name:Test Name", getText(elementsPage.getNameField()));
+        Assertions.assertEquals("Email:TestEmail@gmail.com", getText(elementsPage.getEmailField()));
+        Assertions.assertEquals("Current Address :Moscow, Savyolovskiy",
+                getText(elementsPage.getCurrentAddressField()));
+        Assertions.assertEquals("Permananet Address :Moscow, Savyolovskiy",
+                getText(elementsPage.getPermanentAddressField()));
 //        TODO Баг в написании слова
     }
     @Step
-    private void clickOnButtons(){menuPage.clickButtons();}
+    private void clickOnButtons(){
+        clickElement(menuPage.getButtons());
+    }
     @Step
-    private void clickOnClickMe(){buttonsPage.clickOnClickMeButton();}
+    private void clickOnClickMe(){
+        clickElement(buttonsPage.getClickMeButton());
+    }
     @Step
     private void checkClickMeText(){
-        Assertions.assertEquals("You have done a dynamic click", buttonsPage.getClickMeMessage());}
+        Assertions.assertEquals("You have done a dynamic click",
+                getText(buttonsPage.getClickMeText()));}
     @Step
-    private void clickOnRightClick(){buttonsPage.clickOnRightCluckMeButton();}
+    private void clickOnRightClick(){
+        rightClick(buttonsPage.getRightClickMeButton());
+    }
     @Step
     private void checkRightClickText(){
-        Assertions.assertEquals("You have done a right click", buttonsPage.getRightClickMeText());}
+        Assertions.assertEquals("You have done a right click",
+                getText(buttonsPage.getRightClickMeText()));}
     @Step
-    private void clickOnDoubleClick(){buttonsPage.clickDoubleClickMeButton();}
+    private void clickOnDoubleClick(){
+        doubleClick(buttonsPage.getDoubleClickMeButton());
+    }
     @Step
     private void checkDoubleClickText(){
-        Assertions.assertEquals("You have done a double click", buttonsPage.getDoubleClickMeText());}
+        Assertions.assertEquals("You have done a double click",
+                getText(buttonsPage.getDoubleClickMeText()));}
     @Step
-    private void clickOnAlertsFrameWindow(){menuPage.clickAlertsFrameWindowButton();}
+    private void clickOnAlertsFrameWindow(){
+        clickElement(menuPage.getAlertsFrameWindowButton());
+    }
     @Step
-    private void clickOnBrowserWindow(){menuPage.clickBrowserWindowButton();}
+    private void clickOnBrowserWindow(){
+        clickElement(menuPage.getBrowserWindowButton());
+    }
     @Step
-    private void clickOnNewTab(){browserPage.clickNewTabButton();}
+    private void clickOnNewTab(){
+        clickElement(browserPage.getNewTabButton());
+    }
     @Step
     private void closeOpeningPage(){closeCurrentPage();}
     @Step
-    private void clickOnNewWindow(){browserPage.clickNewWindowButton();}
+    private void clickOnNewWindow(){
+        clickElement(browserPage.getNewWindowButton());
+    }
     @Step
     private void closeOpeningWindow(){closeCurrentPage();}
     @Step
-    private void clickOnAlerts(){menuPage.clickAlertsButton();}
+    private void clickOnAlerts(){
+        clickElement(menuPage.getAlertsButton());
+    }
     @Step
-    private void clickOnSimpleAlert(){alertPage.clickSimpleAlertButton();}
+    private void clickOnSimpleAlert(){
+        clickElement(alertPage.getSimpleAlertButton());
+    }
     @Step
     private void okAlert(){
         Duration durationTime = Duration.ofSeconds(5);
@@ -165,7 +168,9 @@ public class WebTest {
         driver.switchTo().defaultContent();
     }
     @Step
-    private void clickOnFiveSecondAlert(){alertPage.clickFiveSecondAlertButton();}
+    private void clickOnFiveSecondAlert(){
+        clickElement(alertPage.getFiveSecondAlertButton());
+    }
     @Step
     public void closeCurrentPage() {
         Set<String> windowHandles = driver.getWindowHandles();
@@ -177,12 +182,17 @@ public class WebTest {
         driver.switchTo().window(originalWindowHandle);
     }
     @Step
-    public void clickOnConfirmAlertButton(){alertPage.clickConfirmAlertButton();}
+    public void clickOnConfirmAlertButton(){
+        clickElement(alertPage.getConfirmAlertButton());
+    }
     @Step
     public void checkConfirmResult(){
-        Assertions.assertEquals("You selected Ok", alertPage.getConfirmResult());}
+        Assertions.assertEquals("You selected Ok",
+                getText(alertPage.getConfirmResult()));}
     @Step
-    public void clickOnPromAlertButton(){alertPage.clickPromAlertButton();}
+    public void clickOnPromAlertButton(){
+        clickElement(alertPage.getPromAlertButton());
+    }
     @Step
     public void inputProm(){
         // Переключение на всплывающее окно
@@ -194,12 +204,5 @@ public class WebTest {
     }
     @Step
     public void checkPromptResult(){
-        Assertions.assertEquals("You entered Test name", alertPage.getPromptResult());}
-    @AfterAll
-    public static void tearDown() throws InterruptedException {
-        Thread.sleep(2000);
-        driver.quit();
-    }
-
-
+        Assertions.assertEquals("You entered Test name", getText(alertPage.getPromptResult()));}
 }

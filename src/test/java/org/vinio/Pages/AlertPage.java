@@ -1,35 +1,23 @@
 package org.vinio.Pages;
 
+import lombok.Getter;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.vinio.StartTestClass;
 
-public class AlertPage {
-    public WebDriver driver;
-    @FindBy(css = "#alertButton")
-    private WebElement simpleAlertButton;
-    @FindBy(css = "#timerAlertButton")
-    private WebElement fiveSecondAlertButton;
-    @FindBy(css = "#confirmButton")
-    private WebElement confirmAlertButton;
-    @FindBy(css = "#promtButton")
-    private WebElement promAlertButton;
-    @FindBy(css = "#confirmResult")
-    private WebElement confirmResult;
-    @FindBy(css = "#promptResult")
-    private WebElement promptResult;
+@Getter
+public class AlertPage extends StartTestClass {
+    private final By simpleAlertButton = By.cssSelector("#alertButton");
+    private final By fiveSecondAlertButton = By.cssSelector("#timerAlertButton");
+    private final By confirmAlertButton = By.cssSelector("#confirmButton");
+    private final By promAlertButton = By.cssSelector("#promtButton");
+    private final By confirmResult = By.cssSelector("#confirmResult");
+    private final By promptResult = By.cssSelector("#promptResult");
 
     public AlertPage(WebDriver driver) {
         PageFactory.initElements(driver, this);
-        this.driver = driver; }
+        StartTestClass.driver = (EventFiringWebDriver) driver; }
 
-    public void clickSimpleAlertButton(){
-        simpleAlertButton.click();
-    }
-    public void clickFiveSecondAlertButton(){fiveSecondAlertButton.click();}
-    public void clickConfirmAlertButton(){confirmAlertButton.click();}
-    public void clickPromAlertButton(){promAlertButton.click();}
-    public String getConfirmResult(){return confirmResult.getText();}
-    public String getPromptResult(){return promptResult.getText();}
 }

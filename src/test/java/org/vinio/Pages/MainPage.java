@@ -1,9 +1,11 @@
 package org.vinio.Pages;
 
+import lombok.Getter;
+import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.events.EventFiringWebDriver;
+import org.vinio.StartTestClass;
 
 /**
  * элементы страниц, а также методы непосредственного взаимодействия с ними,
@@ -11,14 +13,11 @@ import org.openqa.selenium.support.PageFactory;
  * будет содержать локацию элементов.
  * */
 
-public class MainPage {
-    @FindBy(xpath = "//*[contains(@class, 'card mt-4 top-card') and descendant::h5[text()='Elements']]")
-    private WebElement elements;
-    public WebDriver driver;
+@Getter
+public class MainPage extends StartTestClass {
+    private By elements = By.xpath(
+            "//*[contains(@class, 'card mt-4 top-card') and descendant::h5[text()='Elements']]");
     public MainPage(WebDriver driver) {
-        PageFactory.initElements(driver, this);
-        this.driver = driver; }
-    public void clickElements() {
-        elements.click();
-    }
+        this.driver = (EventFiringWebDriver) driver;
+        PageFactory.initElements(driver, this);}
 }
