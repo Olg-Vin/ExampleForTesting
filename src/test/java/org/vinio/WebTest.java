@@ -1,6 +1,5 @@
 package org.vinio;
 
-import io.qameta.allure.Step;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,7 +12,9 @@ import org.vinio.Pages.*;
 import java.time.Duration;
 import java.util.Set;
 
-//@ExtendWith(TestListener.class)
+import static io.qameta.allure.Allure.step;
+
+@ExtendWith(TestListener.class)
 public class WebTest extends StartTestClass {
     @Test
     public void MainTest() {
@@ -23,72 +24,65 @@ public class WebTest extends StartTestClass {
         buttonsPage = new ButtonsPage(driver);
         browserPage = new BrowserPage(driver);
         alertPage = new AlertPage(driver);
-        openWebSite(url);
-
-        clickOnElements();
-        clickOnTextBox();
-        fullFields();
-        clickOnSubmit();
-        checkData();
-        clickOnButtons();
-        clickOnClickMe();
-        checkClickMeText();
-        clickOnRightClick();
-        checkRightClickText();
-        clickOnDoubleClick();
-        checkDoubleClickText();
-        clickOnAlertsFrameWindow();
-        clickOnBrowserWindow();
-        clickOnNewTab();
-        closeOpeningPage();
-        clickOnNewWindow();
-        closeOpeningWindow();
-        clickOnAlerts();
-        clickOnAlerts();
-        clickOnSimpleAlert();
-        okAlert();
-        clickOnFiveSecondAlert();
-        okAlert();
-        clickOnConfirmAlertButton();
-        okAlert();
-        checkConfirmResult();
-        clickOnPromAlertButton();
-        inputProm();
-        checkPromptResult();
+        step("Открываем главную страницу", () -> openWebSite(url));
+        step("Нажать на «Elements»", this::clickOnElements);
+        step("Нажать на «Text box»", this::clickOnTextBox);
+        step("Заполнить поля: Full Name, Email, Current Address, Permanent Address", this::fullFields);
+        step("Нажать на кнопку «Submit»", this::clickOnSubmit);
+        step("Проверить, что данные в блоке сохранены корректно", this::checkData);
+        step("Нажать на «Buttons»", this::clickOnButtons);
+        step("Нажать на кнопку «Click me»", this::clickOnClickMe);
+        step("Проверить, что появился текст «You have done a dynamic click»", this::checkClickMeText);
+        step("Нажать на кнопку «Right Click me»", this::clickOnRightClick);
+        step("Проверить, что появился текст «You have done a right click»", this::checkRightClickText);
+        step("Нажать на кнопку «Double Click me»", this::clickOnDoubleClick);
+        step("Проверить, что появился текст «You have done a double click»", this::checkDoubleClickText);
+        step("Нажать на «Alerts, Frame & Windows»", this::clickOnAlertsFrameWindow);
+        step("Нажать на «Browser Windows»", this::clickOnBrowserWindow);
+        step("Нажать на кнопку «New Tab»", this::clickOnNewTab);
+        step("Закрыть новую вкладку", this::closeOpeningPage);
+        step("Нажать на кнопку «New window»", this::clickOnNewWindow);
+        step("Закрыть новое окно", this::closeOpeningWindow);
+        step("Нажать на «Alerts»", this::clickOnAlerts);
+        step("Нажать на кнопку «Click me»  рядом с Click Button to see alert", this::clickOnSimpleAlert);
+        step("Закрыть уведомление", this::okAlert);
+        step("Нажать на кнопку «Click me»  рядом с On button click, alert will appear after 5 seconds", this::clickOnFiveSecondAlert);
+        step("Закрыть уведомление", this::okAlert);
+        step("Нажать на кнопку «Click me»  рядом с On button click, confirm box will appear", this::clickOnConfirmAlertButton);
+        step("Нажать на кнопку «Да» в уведомление", this::okAlert);
+        step("Проверить, что появился текст You selected Ok", this::checkConfirmResult);
+        step("Нажать на кнопку «Click me»  рядом с On button click, prompt box will appear", this::clickOnPromAlertButton);
+        step("Заполнить поле в уведомление данными: Test name", this::inputProm);
+        step("Проверить, что появился текст You entered Test name", this::checkPromptResult);
     }
-    @Step
     public void openWebSite(String url){
         Duration durationTime = Duration.ofSeconds(5);
         driver.manage().timeouts().pageLoadTimeout(durationTime);
         try {
             driver.get(url);
         }catch (TimeoutException e) {
+            driver.navigate().forward();
 //            TODO В случае возникновения ошибки (например, превышение времени ожидания), прервать загрузку
             System.out.println("ERROR");
             System.out.println(e.getMessage());
         }
         setOriginalWindowHandle();
     }
-    @Step
     private void clickOnElements(){
         clickElement(mainPage.getElements());
     }
-    @Step
     private void clickOnTextBox(){
         clickElement(menuPage.getTextBox());
     }
-    @Step
     private void fullFields(){
         inputText(elementsPage.getFullName(), "Test Name");
         inputText(elementsPage.getEmail(), "TestEmail@gmail.com");
         inputText(elementsPage.getCurrentAddress(), "Moscow, Savyolovskiy");
         inputText(elementsPage.getPermanentAddress(), "Moscow, Savyolovskiy");
     }
-    @Step
     private void clickOnSubmit(){
         clickElement(elementsPage.getSubmitButton());
     }
-    @Step
     private void checkData(){
         Assertions.assertEquals("Name:Test Name", getText(elementsPage.getNameField()));
         Assertions.assertEquals("Email:TestEmail@gmail.com", getText(elementsPage.getEmailField()));
@@ -98,63 +92,47 @@ public class WebTest extends StartTestClass {
                 getText(elementsPage.getPermanentAddressField()));
 //        TODO Баг в написании слова
     }
-    @Step
     private void clickOnButtons(){
         clickElement(menuPage.getButtons());
     }
-    @Step
     private void clickOnClickMe(){
         clickElement(buttonsPage.getClickMeButton());
     }
-    @Step
     private void checkClickMeText(){
         Assertions.assertEquals("You have done a dynamic click",
                 getText(buttonsPage.getClickMeText()));}
-    @Step
     private void clickOnRightClick(){
         rightClick(buttonsPage.getRightClickMeButton());
     }
-    @Step
     private void checkRightClickText(){
         Assertions.assertEquals("You have done a right click",
                 getText(buttonsPage.getRightClickMeText()));}
-    @Step
     private void clickOnDoubleClick(){
         doubleClick(buttonsPage.getDoubleClickMeButton());
     }
-    @Step
     private void checkDoubleClickText(){
         Assertions.assertEquals("You have done a double click",
                 getText(buttonsPage.getDoubleClickMeText()));}
-    @Step
     private void clickOnAlertsFrameWindow(){
         clickElement(menuPage.getAlertsFrameWindowButton());
     }
-    @Step
     private void clickOnBrowserWindow(){
         clickElement(menuPage.getBrowserWindowButton());
     }
-    @Step
     private void clickOnNewTab(){
         clickElement(browserPage.getNewTabButton());
     }
-    @Step
     private void closeOpeningPage(){closeCurrentPage();}
-    @Step
     private void clickOnNewWindow(){
         clickElement(browserPage.getNewWindowButton());
     }
-    @Step
     private void closeOpeningWindow(){closeCurrentPage();}
-    @Step
     private void clickOnAlerts(){
         clickElement(menuPage.getAlertsButton());
     }
-    @Step
     private void clickOnSimpleAlert(){
         clickElement(alertPage.getSimpleAlertButton());
     }
-    @Step
     private void okAlert(){
         Duration durationTime = Duration.ofSeconds(5);
         // Ожидание появления всплывающего окна в течение 5 секунд
@@ -167,11 +145,9 @@ public class WebTest extends StartTestClass {
         // Возврат к основному контексту
         driver.switchTo().defaultContent();
     }
-    @Step
     private void clickOnFiveSecondAlert(){
         clickElement(alertPage.getFiveSecondAlertButton());
     }
-    @Step
     public void closeCurrentPage() {
         Set<String> windowHandles = driver.getWindowHandles();
         windowHandles.remove(originalWindowHandle);
@@ -181,19 +157,15 @@ public class WebTest extends StartTestClass {
         }
         driver.switchTo().window(originalWindowHandle);
     }
-    @Step
     public void clickOnConfirmAlertButton(){
         clickElement(alertPage.getConfirmAlertButton());
     }
-    @Step
     public void checkConfirmResult(){
         Assertions.assertEquals("You selected Ok",
                 getText(alertPage.getConfirmResult()));}
-    @Step
     public void clickOnPromAlertButton(){
         clickElement(alertPage.getPromAlertButton());
     }
-    @Step
     public void inputProm(){
         // Переключение на всплывающее окно
         Alert alert = driver.switchTo().alert();
@@ -202,7 +174,6 @@ public class WebTest extends StartTestClass {
         // Нажатие на кнопку "Ok" или другую нужную кнопку
         alert.accept();
     }
-    @Step
     public void checkPromptResult(){
         Assertions.assertEquals("You entered Test name", getText(alertPage.getPromptResult()));}
 }
