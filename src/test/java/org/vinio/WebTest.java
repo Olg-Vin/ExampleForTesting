@@ -13,7 +13,7 @@ import org.vinio.Pages.*;
 import java.time.Duration;
 import java.util.Set;
 
-@ExtendWith(TestListener.class)
+//@ExtendWith(TestListener.class)
 public class WebTest extends StartTestClass {
     @Test
     public void MainTest() {
