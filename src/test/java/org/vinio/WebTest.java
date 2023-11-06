@@ -2,7 +2,6 @@ package org.vinio;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.openqa.selenium.Alert;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -14,7 +13,6 @@ import java.util.Set;
 
 import static io.qameta.allure.Allure.step;
 
-@ExtendWith(TestListener.class)
 public class WebTest extends StartTestClass {
     @Test
     public void MainTest() {
